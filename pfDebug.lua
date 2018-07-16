@@ -1,4 +1,4 @@
-local pfDebug = CreateFrame("Frame", "pfDebug", UIParent)
+local pfDebug = CreateFrame("Button", "pfDebug", UIParent)
 pfDebug.lastTime = GetTime()
 pfDebug.lastMem = 999999999
 pfDebug.curMem = 999999999
@@ -25,6 +25,9 @@ pfDebug:SetMovable(true)
 pfDebug:EnableMouse(true)
 pfDebug:SetScript("OnMouseDown",function() this:StartMoving() end)
 pfDebug:SetScript("OnMouseUp",function() this:StopMovingOrSizing() end)
+pfDebug:SetScript("OnClick",function()
+  pfDebug.bar:SetValue(0)
+end)
 
 pfDebug.rate = pfDebug:CreateFontString("pfDebugMemRate", "LOW", "NumberFontNormalSmall")
 pfDebug.rate:SetPoint("TOPLEFT", 5, -5)
@@ -42,6 +45,7 @@ pfDebug.bar:SetStatusBarColor(1,.3,.3,1)
 pfDebug.bar:SetPoint("BOTTOM", 0, 0)
 pfDebug.bar:SetMinMaxValues(0, 0)
 pfDebug.bar:SetValue(20)
+
 pfDebug.barcap = pfDebug.bar:CreateFontString("pfDebugMemBarCap", "OVERLAY", "NumberFontNormalSmall")
 pfDebug.barcap:SetPoint("LEFT", 5, 0)
 pfDebug.barcap:SetTextColor(1,1,1)
