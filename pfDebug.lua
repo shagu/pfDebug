@@ -1,3 +1,6 @@
+-- pfDebug:
+-- A little tool to monitor the memory usage, peaks and garbage collection.
+-- I haven't put too much effort in this. Don't expect to see rocket science here.
 local pfDebug = CreateFrame("Button", "pfDebug", UIParent)
 pfDebug.lastTime = GetTime()
 pfDebug.lastMem = 999999999
@@ -10,7 +13,7 @@ pfDebug.curMemMS = 999999999
 pfDebug.gc = 0
 
 pfDebug:SetPoint("CENTER", 0, 0)
-pfDebug:SetHeight(100)
+pfDebug:SetHeight(85)
 pfDebug:SetWidth(200)
 pfDebug:SetBackdrop({
   bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = false, tileSize = 0,
@@ -18,41 +21,41 @@ pfDebug:SetBackdrop({
   insets = {left = -1, right = -1, top = -1, bottom = -1},
 })
 
-pfDebug:SetBackdropColor(.1,.1,.1,1)
-pfDebug:SetBackdropBorderColor(.2,.2,.2,1)
+pfDebug:SetBackdropColor(0,0,0,.75)
+pfDebug:SetBackdropBorderColor(.1,.1,.1,1)
+pfDebug:RegisterEvent("PLAYER_ENTERING_WORLD")
+pfDebug:SetScript("OnEvent", function() this:Show() end)
+pfDebug:Hide()
 
 pfDebug:SetMovable(true)
 pfDebug:EnableMouse(true)
+pfDebug:SetClampedToScreen(true)
 pfDebug:SetScript("OnMouseDown",function() this:StartMoving() end)
 pfDebug:SetScript("OnMouseUp",function() this:StopMovingOrSizing() end)
 pfDebug:SetScript("OnClick",function()
   pfDebug.bar:SetValue(0)
 end)
 
-pfDebug.rate = pfDebug:CreateFontString("pfDebugMemRate", "LOW", "NumberFontNormalSmall")
-pfDebug.rate:SetPoint("TOPLEFT", 5, -5)
+pfDebug.rate = pfDebug:CreateFontString("pfDebugMemRate", "LOW", "GameFontWhite")
+pfDebug.rate:SetPoint("TOPLEFT", 3, -3)
 
-pfDebug.curmax = pfDebug:CreateFontString("pfDebugMemCurMax", "LOW", "NumberFontNormalSmall")
-pfDebug.curmax:SetPoint("TOPLEFT", 5, -25)
-pfDebug.last = pfDebug:CreateFontString("pfDebugMemLast", "LOW", "NumberFontNormalSmall")
-pfDebug.last:SetPoint("TOPLEFT", 5, -50)
+pfDebug.curmax = pfDebug:CreateFontString("pfDebugMemCurMax", "LOW", "GameFontWhite")
+pfDebug.curmax:SetPoint("TOPLEFT", 3, -23)
+pfDebug.last = pfDebug:CreateFontString("pfDebugMemLast", "LOW", "GameFontWhite")
+pfDebug.last:SetPoint("TOPLEFT", 3, -43)
 
 pfDebug.bar = CreateFrame("StatusBar", nil, pfDebug)
-pfDebug.bar:SetHeight(20)
-pfDebug.bar:SetWidth(200)
 pfDebug.bar:SetStatusBarTexture("Interface\\BUTTONS\\WHITE8X8")
 pfDebug.bar:SetStatusBarColor(1,.3,.3,1)
-pfDebug.bar:SetPoint("BOTTOM", 0, 0)
+pfDebug.bar:SetPoint("BOTTOMLEFT", pfDebug, "BOTTOMLEFT", 1, 1)
+pfDebug.bar:SetPoint("BOTTOMRIGHT", pfDebug, "BOTTOMRIGHT", -1, 1)
+pfDebug.bar:SetHeight(20)
 pfDebug.bar:SetMinMaxValues(0, 0)
 pfDebug.bar:SetValue(20)
 
-pfDebug.barcap = pfDebug.bar:CreateFontString("pfDebugMemBarCap", "OVERLAY", "NumberFontNormalSmall")
-pfDebug.barcap:SetPoint("LEFT", 5, 0)
+pfDebug.barcap = pfDebug.bar:CreateFontString("pfDebugMemBarCap", "OVERLAY", "GameFontWhite")
+pfDebug.barcap:SetPoint("LEFT", 2, 0)
 pfDebug.barcap:SetTextColor(1,1,1)
-
-pfDebug:RegisterEvent("PLAYER_ENTERING_WORLD")
-pfDebug:SetScript("OnEvent", function() this:Show() end)
-pfDebug:Hide()
 
 pfDebug:SetScript("OnUpdate", function()
   if this.lastTimeMS + .1 < GetTime() and GetTime() > 2 then
@@ -61,7 +64,8 @@ pfDebug:SetScript("OnUpdate", function()
     this.curMemMS, this.gc = gcinfo()
 
     if this.lastMemMS > this.curMemMS then
-      pfDebug.last:SetText("|cff33ffccLast Cleanup:|cffffffff " .. date("%H:%M"))
+      this.lastCleanUp = GetTime()
+      this.lastCleanUpTime = date("%H:%M:%S")
     end
 
     local barval, newval = this.bar:GetValue(), ( this.curMemMS - this.lastMemMS )
@@ -77,6 +81,11 @@ pfDebug:SetScript("OnUpdate", function()
   end
 
   if this.lastTime + 1 < GetTime() then
+    if this.lastCleanUp and this.lastCleanUpTime then
+      pfDebug:SetWidth(pfDebug.last:GetStringWidth() + 10)
+      pfDebug.last:SetText("|cff33ffccLast Cleanup:|cffffffff " .. this.lastCleanUpTime .. " |cffaaaaaa(" .. SecondsToTime(GetTime()-this.lastCleanUp) .. " ago)")
+    end
+
     this.lastTime = GetTime()
     this.lastMem = this.curMem
     this.curMem, this.gc = gcinfo()
