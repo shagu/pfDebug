@@ -98,3 +98,41 @@ pfDebug:SetScript("OnUpdate", function()
     this.rate:SetText("|cff33ffccCurrent Rate:|cffffffff " .. this.curMem - this.lastMem .. "|cffaaaaaa kB/s")
   end
 end)
+
+local matches = {}
+local function ScanFrames(parent)
+  local scanqueue
+
+  if parent.GetChildren and type(parent.GetChildren) == "function" and parent:GetChildren() then
+    scanqueue = { parent, { parent:GetChildren() } }
+  else
+    scanqueue = { parent }
+  end
+
+  for _, queue in pairs(scanqueue) do
+    for name, frame in pairs(queue) do
+      if frame and type(frame) == "table" then
+        local name = (frame.GetName and type(frame.GetName) == "function" and frame:GetName()) and frame:GetName() or tostring(frame)
+
+        if name and not matches[name] then
+          if frame.GetFrameType and type(frame.GetFrameType) == "function" and frame:GetFrameType() then
+            matches[name] = frame
+          end
+
+          ScanFrames(frame)
+        end
+      end
+    end
+  end
+end
+
+function pfDebug:Start()
+  matches = {}
+  ScanFrames(getfenv())
+
+  local count = 0
+  for name, frame in pairs(matches) do
+    count = count + 1
+  end
+  message(count .. " Objects Found")
+end
