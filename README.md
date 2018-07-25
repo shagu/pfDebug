@@ -6,6 +6,10 @@ A little tool to monitor the memory usage, peaks and garbage collection.
 
 ![preview](preview.jpg)
 
+## Usage
+- Left-Click on the Bar to reset the Peak
+- Right-Click on the Frame to open the Analyzer
+
 ## Installation
 1. Download **[Latest Version](https://gitlab.com/shagu/pfDebug/-/archive/master/pfDebug-master.zip)**
 2. Unpack the Zip file
