@@ -47,8 +47,8 @@ local function MeasureFunction(func, name)
     data[name] = { 1, runtime, runmem }
   else
     data[name][1] = data[name][1] + 1
-    data[name][2] = data[name][2] + runtime
-    data[name][3] = data[name][3] + runmem
+    data[name][2] = data[name][2] + ( runtime > 0 and runtime or 0 )
+    data[name][3] = data[name][3] + ( runmem > 0 and runmem or 0 )
   end
 end
 
