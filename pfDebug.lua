@@ -15,13 +15,7 @@ local CreateBackdrop = pfUI and pfUI.api and pfUI.api.CreateBackdrop or function
   frame:SetBackdropBorderColor(.1,.1,.1,1)
 end
 
-local SkinButton = pfUI and pfUI.api and pfUI.api.SkinButton or function(frame)
-  for i,v in ipairs({frame:GetRegions()}) do
-    if v.SetVertexColor then
-      v:SetVertexColor(.2,.2,.2,1)
-    end
-  end
-end
+local SkinButton = pfUI and pfUI.api and pfUI.api.SkinButton or function(frame) return end
 
 local pfDebug = CreateFrame("Button", "pfDebug", UIParent)
 
