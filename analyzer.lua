@@ -111,44 +111,56 @@ analyzer:SetScript("OnUpdate", function()
 
   for frame, entry in spairs(data, sortby, true) do
     if i > 12 then break end
-    if i == 1 then maxval = entry[sortby] end
+    if ( analyzer.onupdate:GetChecked() and strfind(frame, ":OnUpdate") ) or
+    ( analyzer.onevent:GetChecked() and strfind(frame, ":OnEvent") ) then
+      if i == 1 then maxval = entry[sortby] end
 
-    local count = entry[1]
-    local time = round(entry[2]*100, 5) .. " ms"
-    local mem = round(entry[3], 5) .. " kB"
+      local count = entry[1]
+      local time = round(entry[2]*100, 5) .. " ms"
+      local mem = round(entry[3], 5) .. " kB"
 
-    analyzer.bars[i].data = entry
-    analyzer.bars[i].name = frame
+      analyzer.bars[i].data = entry
+      analyzer.bars[i].name = frame
 
-    analyzer.bars[i]:SetMinMaxValues(0, maxval)
-    analyzer.bars[i]:SetValue(entry[sortby])
+      analyzer.bars[i]:SetMinMaxValues(0, maxval)
+      analyzer.bars[i]:SetValue(entry[sortby])
 
-    local text = gsub(frame, ":", "|cffaaaaaa:|r")
-    text =  gsub(text, "OnEvent%(%)", "|cffaaaa00OnEvent|cffaaaaaa%(%)")
-    text =  gsub(text, "OnUpdate%(%)", "|cff00aaaaOnUpdate|cffaaaaaa%(%)")
-    analyzer.bars[i].left:SetText(text)
+      local text = gsub(frame, ":", "|cffaaaaaa:|r")
+      text =  gsub(text, "OnEvent%(%)", "|cffffcc00OnEvent|cffaaaaaa%(%)")
+      text =  gsub(text, "OnUpdate%(%)", "|cff33ffccOnUpdate|cffaaaaaa%(%)")
+      analyzer.bars[i].left:SetText(text)
 
-    if sortby == 1 then
-      analyzer.bars[i].right:SetText(count)
-    elseif sortby == 2 then
-      analyzer.bars[i].right:SetText(time)
-    elseif sortby == 3 then
-      analyzer.bars[i].right:SetText(mem)
+      if sortby == 1 then
+        analyzer.bars[i].right:SetText(count)
+      elseif sortby == 2 then
+        analyzer.bars[i].right:SetText(time)
+      elseif sortby == 3 then
+        analyzer.bars[i].right:SetText(mem)
+      end
+
+      local perc = entry[sortby] / maxval
+      local r1, g1, b1, r2, g2, b2
+      if perc <= 0.5 then
+        perc = perc * 2
+        r1, g1, b1 = 0, 1, 0
+        r2, g2, b2 = 1, 1, 0
+      else
+        perc = perc * 2 - 1
+        r1, g1, b1 = 1, 1, 0
+        r2, g2, b2 = 1, 0, 0
+      end
+      analyzer.bars[i]:SetStatusBarColor(r1 + (r2 - r1)*perc,g1 + (g2 - g1)*perc,b1 + (b2 - b1)*perc, .1)
+      i = i + 1
     end
+  end
 
-    local perc = entry[sortby] / maxval
-    local r1, g1, b1, r2, g2, b2
-    if perc <= 0.5 then
-      perc = perc * 2
-      r1, g1, b1 = 0, 1, 0
-      r2, g2, b2 = 1, 1, 0
-    else
-      perc = perc * 2 - 1
-      r1, g1, b1 = 1, 1, 0
-      r2, g2, b2 = 1, 0, 0
-    end
-    analyzer.bars[i]:SetStatusBarColor(r1 + (r2 - r1)*perc,g1 + (g2 - g1)*perc,b1 + (b2 - b1)*perc, .1)
-    i = i + 1
+  -- hide remaining bars
+  for i=i,12 do
+    analyzer.bars[i]:SetValue(0)
+    analyzer.bars[i].name = nil
+    analyzer.bars[i].data = nil
+    analyzer.bars[i].left:SetText("")
+    analyzer.bars[i].right:SetText("")
   end
 end)
 
@@ -243,6 +255,13 @@ analyzer.count:SetWidth(50)
 analyzer.count:SetPoint("RIGHT", -3, 0)
 analyzer.count:SetText("Count")
 analyzer.count:SetScript("OnClick", function() analyzer.sortby = 1 end)
+analyzer.count:SetScript("OnLeave", function() GameTooltip:Hide() end)
+analyzer.count:SetScript("OnEnter", function()
+  GameTooltip:ClearLines()
+  GameTooltip:SetOwner(this, "ANCHOR_BOTTOMLEFT", 0, 0)
+  GameTooltip:AddLine("Order By Execution Count", 1,1,1,1)
+  GameTooltip:Show()
+end)
 
 analyzer.time = CreateFrame("Button", "pfDebugAnalyzerSortTime", analyzer.toolbar, "UIPanelButtonTemplate")
 pfDebug.SkinButton(analyzer.time)
@@ -251,6 +270,13 @@ analyzer.time:SetWidth(50)
 analyzer.time:SetPoint("RIGHT", -56, 0)
 analyzer.time:SetText("Time")
 analyzer.time:SetScript("OnClick", function() analyzer.sortby = 2 end)
+analyzer.time:SetScript("OnLeave", function() GameTooltip:Hide() end)
+analyzer.time:SetScript("OnEnter", function()
+  GameTooltip:ClearLines()
+  GameTooltip:SetOwner(this, "ANCHOR_BOTTOMLEFT", 0, 0)
+  GameTooltip:AddLine("Order By Execution Time", 1,1,1,1)
+  GameTooltip:Show()
+end)
 
 analyzer.memory = CreateFrame("Button", "pfDebugAnalyzerSortTime", analyzer.toolbar, "UIPanelButtonTemplate")
 pfDebug.SkinButton(analyzer.memory)
@@ -259,6 +285,40 @@ analyzer.memory:SetWidth(50)
 analyzer.memory:SetPoint("RIGHT", -109, 0)
 analyzer.memory:SetText("Memory")
 analyzer.memory:SetScript("OnClick", function() analyzer.sortby = 3 end)
+analyzer.memory:SetScript("OnLeave", function() GameTooltip:Hide() end)
+analyzer.memory:SetScript("OnEnter", function()
+  GameTooltip:ClearLines()
+  GameTooltip:SetOwner(this, "ANCHOR_BOTTOMLEFT", 0, 0)
+  GameTooltip:AddLine("Order By Memory Consumption", 1,1,1,1)
+  GameTooltip:Show()
+end)
+
+
+analyzer.onupdate = CreateFrame("CheckButton", "pfDebugAnalyzerShowUpdate", analyzer.toolbar, "UICheckButtonTemplate")
+analyzer.onupdate:SetPoint("RIGHT", -165, 0)
+analyzer.onupdate:SetWidth(16)
+analyzer.onupdate:SetHeight(16)
+analyzer.onupdate:SetChecked(true)
+analyzer.onupdate:SetScript("OnLeave", function() GameTooltip:Hide() end)
+analyzer.onupdate:SetScript("OnEnter", function()
+  GameTooltip:ClearLines()
+  GameTooltip:SetOwner(this, "ANCHOR_BOTTOMLEFT", 0, 0)
+  GameTooltip:AddLine("Display |cff33ffccOnUpdate", 1,1,1,1)
+  GameTooltip:Show()
+end)
+
+analyzer.onevent = CreateFrame("CheckButton", "pfDebugAnalyzerShowEvent", analyzer.toolbar, "UICheckButtonTemplate")
+analyzer.onevent:SetPoint("RIGHT", -185, 0)
+analyzer.onevent:SetWidth(16)
+analyzer.onevent:SetHeight(16)
+analyzer.onevent:SetChecked(true)
+analyzer.onevent:SetScript("OnLeave", function() GameTooltip:Hide() end)
+analyzer.onevent:SetScript("OnEnter", function()
+  GameTooltip:ClearLines()
+  GameTooltip:SetOwner(this, "ANCHOR_BOTTOMLEFT", 0, 0)
+  GameTooltip:AddLine("Display |cffffcc00OnEvent", 1,1,1,1)
+  GameTooltip:Show()
+end)
 
 analyzer.bars = {}
 for i=1,12 do
@@ -269,13 +329,42 @@ for i=1,12 do
   analyzer.bars[i]:SetMinMaxValues(0,100)
   analyzer.bars[i]:SetValue(0)
   analyzer.bars[i]:SetStatusBarTexture("Interface\\BUTTONS\\WHITE8X8")
+  analyzer.bars[i]:EnableMouse(true)
+  analyzer.bars[i]:SetScript("OnEnter", function()
+    if not this.name or not this.data then return end
+    local name = this.name
+    local count = "|cffffffff" .. this.data[1] .. "|cffaaaaaax"
+    local time = "|cffffffff" .. round(this.data[2]*100, 5) .. " |cffaaaaaams"
+    local time_avg = "|cffffffff" .. round(this.data[2]/this.data[3]*100, 5) .. " |cffaaaaaams"
+    local mem = "|cffffffff" .. round(this.data[3], 5) .. " |cffaaaaaakB"
+    local mem_avg = "|cffffffff" .. round(this.data[3]/this.data[1], 5) .. " |cffaaaaaakB"
 
+    name = gsub(name, ":", "|cffaaaaaa:|r")
+    name =  gsub(name, "OnEvent%(%)", "|cffffcc00OnEvent|cffaaaaaa%(%)")
+    name =  gsub(name, "OnUpdate%(%)", "|cff33ffccOnUpdate|cffaaaaaa%(%)")
+
+    GameTooltip:ClearLines()
+    GameTooltip:SetOwner(this, "ANCHOR_LEFT", -10, -5)
+    GameTooltip:AddLine(name)
+    GameTooltip:AddDoubleLine("Execution Count:", count)
+    GameTooltip:AddDoubleLine("Overall Execution Time:", time)
+    GameTooltip:AddDoubleLine("Average Execution Time:", time_avg)
+    GameTooltip:AddLine(" ")
+    GameTooltip:AddDoubleLine("Overall Memory Consumption:", mem)
+    GameTooltip:AddDoubleLine("Average Memory Consumption:", mem_avg)
+    GameTooltip:Show()
+  end)
+
+  analyzer.bars[i]:SetScript("OnLeave", function()
+    if not this.name or not this.data then return end
+    GameTooltip:Hide()
+  end)
   analyzer.bars[i].left = analyzer.bars[i]:CreateFontString(nil, "HIGH", "GameFontWhite")
-  analyzer.bars[i].left:SetPoint("LEFT", 0, 0)
+  analyzer.bars[i].left:SetPoint("LEFT", 5, 0)
   analyzer.bars[i].left:SetJustifyH("LEFT")
 
   analyzer.bars[i].right = analyzer.bars[i]:CreateFontString(nil, "HIGH", "GameFontWhite")
-  analyzer.bars[i].right:SetPoint("RIGHT", 0, 0)
+  analyzer.bars[i].right:SetPoint("RIGHT", -5, 0)
   analyzer.bars[i].right:SetJustifyH("RIGHT")
 
   pfDebug.CreateBackdrop(analyzer.bars[i])
