@@ -345,7 +345,7 @@ for i=1,12 do
 
     GameTooltip:ClearLines()
     GameTooltip:SetOwner(this, "ANCHOR_LEFT", -10, -5)
-    GameTooltip:AddLine(name)
+    GameTooltip:AddLine(name,1,1,1,1)
     GameTooltip:AddDoubleLine("Execution Count:", count)
     GameTooltip:AddDoubleLine("Overall Execution Time:", time)
     GameTooltip:AddDoubleLine("Average Execution Time:", time_avg)
