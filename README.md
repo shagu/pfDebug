@@ -2,6 +2,8 @@
 
 A little tool to monitor the memory usage, peaks and garbage collection.
 
+**WARNING: This is still in an early development state!**
+
 ![preview](preview.jpg)
 
 ## Installation
