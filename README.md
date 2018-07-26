@@ -2,9 +2,9 @@
 
 A little tool to monitor the memory usage, peaks and garbage collection.
 
-**WARNING: This is still in an early development state!**
+![widget](widget.jpg)
 
-![preview](preview.jpg)
+![analyzer](analyzer.jpg)
 
 ## Usage
 - Left-Click on the Bar to reset the Peak
