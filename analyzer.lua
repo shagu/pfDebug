@@ -1,10 +1,12 @@
 local scanned = {}
+
+local frameref = {}
 local frames = {}
 local data = {}
 
 -- search as many frames as possible that are children or subtree elements of
 -- the given parent frame. all found frames are saved in the `frames`-table
-local function ScanFrames(parent)
+local function ScanFrames(parent, parentname)
   -- find as many frames as possible by analyzer.scanning through the parent's childs.
   local scanqueue
 
@@ -15,17 +17,33 @@ local function ScanFrames(parent)
   end
 
   for _, queue in pairs(scanqueue) do
-    for _, frame in pairs(queue) do
+    for objname, frame in pairs(queue) do
       if frame and type(frame) == "table" and frame ~= parent then
         local name = tostring(frame)
         if name and not scanned[name] then
           scanned[name] = true
 
-          if pcall(function() return frame:GetFrameType() end) and frame:GetFrameType() then
-            frames[name] = frame
+          -- code hierarchy detection for unnamed frames
+          local obj = "nil"
+          local objname = type(objname) == "string" and objname or ""
+          local parentname = type(parentname) == "string" and parentname or ""
+          if objname == "_G" then
+            parentname = ""
+            objname = ""
+            obj = ""
+          else
+            obj = parentname .. ( parentname ~= "" and "." or "" ) .. objname
           end
 
-          ScanFrames(frame)
+          if pcall(function() return frame:GetFrameType() end) and frame:GetFrameType() then
+            frames[name] = frame
+            if objname then
+              frameref[name] = obj
+              message(obj)
+            end
+          end
+
+          ScanFrames(frame, obj)
         end
       end
     end
@@ -206,7 +224,7 @@ analyzer.scan:SetScript("OnClick", function()
     if frame.GetScript and not frame.pfDEBUGHooked then
       frame.pfDEBUGHooked = true
 
-      local name = (frame.GetName and type(frame.GetName) == "function" and frame:GetName()) and frame:GetName() or tostring(frame)
+      local name = (frame.GetName and type(frame.GetName) == "function" and frame:GetName()) and frame:GetName() or frameref[tostring(frame)] or tostring(frame)
 
       local OnEvent = frame:GetScript("OnEvent")
       if OnEvent then
@@ -351,6 +369,7 @@ for i=1,12 do
     GameTooltip:AddLine(" ")
     GameTooltip:AddDoubleLine("Overall Memory Consumption:", mem)
     GameTooltip:AddDoubleLine("Average Memory Consumption:", mem_avg)
+
     GameTooltip:Show()
   end)
 
