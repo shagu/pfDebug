@@ -39,7 +39,6 @@ local function ScanFrames(parent, parentname)
             frames[name] = frame
             if objname then
               frameref[name] = obj
-              message(obj)
             end
           end
 
