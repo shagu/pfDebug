@@ -8,7 +8,7 @@ local function ScanFrames(parent)
   -- find as many frames as possible by analyzer.scanning through the parent's childs.
   local scanqueue
 
-  if parent.GetChildren and type(parent.GetChildren) == "function" and parent:GetChildren() then
+  if pcall(function() return parent:GetChildren() end) and parent:GetChildren() then
     scanqueue = { parent, { parent:GetChildren() } }
   else
     scanqueue = { parent }
@@ -21,7 +21,7 @@ local function ScanFrames(parent)
         if name and not scanned[name] then
           scanned[name] = true
 
-          if frame.GetFrameType and type(frame.GetFrameType) == "function" and frame:GetFrameType() then
+          if pcall(function() return frame:GetFrameType() end) and frame:GetFrameType() then
             frames[name] = frame
           end
 
@@ -292,7 +292,6 @@ analyzer.memory:SetScript("OnEnter", function()
   GameTooltip:AddLine("Order By Memory Consumption", 1,1,1,1)
   GameTooltip:Show()
 end)
-
 
 analyzer.onupdate = CreateFrame("CheckButton", "pfDebugAnalyzerShowUpdate", analyzer.toolbar, "UICheckButtonTemplate")
 analyzer.onupdate:SetPoint("RIGHT", -195, 0)
