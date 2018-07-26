@@ -1,5 +1,5 @@
+local hide_self = true
 local scanned = {}
-
 local frameref = {}
 local frames = {}
 local data = {}
@@ -216,6 +216,12 @@ analyzer.scan:SetScript("OnClick", function()
   -- calculate the findings
   local framecount = 0
   for _ in pairs(frames) do framecount = framecount + 1 end
+
+  -- hide pfDebug from the stats
+  if hide_self then
+    frames[tostring(pfDebug)] = nil
+    frames[tostring(pfDebugAnalyzer)] = nil
+  end
 
   -- add hooks to functions
   local functioncount = 0
