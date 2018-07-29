@@ -133,7 +133,7 @@ analyzer:SetScript("OnUpdate", function()
       if i == 1 then maxval = entry[sortby] end
 
       local count = entry[1]
-      local time = round(entry[2]*100, 5) .. " ms"
+      local time = round(entry[2]*1000, 5) .. " ms"
       local mem = round(entry[3], 5) .. " kB"
 
       analyzer.bars[i].data = entry
@@ -356,8 +356,8 @@ for i=1,12 do
     if not this.name or not this.data then return end
     local name = this.name
     local count = "|cffffffff" .. this.data[1] .. "|cffaaaaaax"
-    local time = "|cffffffff" .. round(this.data[2]*100, 5) .. " |cffaaaaaams"
-    local time_avg = "|cffffffff" .. round(this.data[2]/this.data[3]*100, 5) .. " |cffaaaaaams"
+    local time = "|cffffffff" .. round(this.data[2]*1000, 5) .. " |cffaaaaaams"
+    local time_avg = "|cffffffff" .. round(this.data[2]/this.data[3]*1000, 5) .. " |cffaaaaaams"
     local mem = "|cffffffff" .. round(this.data[3], 5) .. " |cffaaaaaakB"
     local mem_avg = "|cffffffff" .. round(this.data[3]/this.data[1], 5) .. " |cffaaaaaakB"
 
