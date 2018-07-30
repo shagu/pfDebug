@@ -357,7 +357,7 @@ for i=1,12 do
     local name = this.name
     local count = "|cffffffff" .. this.data[1] .. "|cffaaaaaax"
     local time = "|cffffffff" .. round(this.data[2]*1000, 5) .. " |cffaaaaaams"
-    local time_avg = "|cffffffff" .. round(this.data[2]/this.data[3]*1000, 5) .. " |cffaaaaaams"
+    local time_avg = "|cffffffff" .. round(this.data[2]/this.data[1]*1000, 5) .. " |cffaaaaaams"
     local mem = "|cffffffff" .. round(this.data[3], 5) .. " |cffaaaaaakB"
     local mem_avg = "|cffffffff" .. round(this.data[3]/this.data[1], 5) .. " |cffaaaaaakB"
 
