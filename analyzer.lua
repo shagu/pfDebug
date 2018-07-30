@@ -27,7 +27,7 @@ local function ScanFrames(parent, parentname)
           local obj = "nil"
           local objname = type(objname) == "string" and objname or ""
           local parentname = type(parentname) == "string" and parentname or ""
-          if objname == "_G" then
+          if objname == "_G" or frame == getfenv(0) or objname == "" then
             parentname = ""
             objname = ""
             obj = ""
