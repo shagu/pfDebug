@@ -11,7 +11,7 @@ A little tool to monitor the memory usage, peaks and garbage collection.
 - Right-Click on the Frame to open the Analyzer
 
 ## Installation
-1. Download **[Latest Version](https://gitlab.com/shagu/pfDebug/-/archive/master/pfDebug-master.zip)**
+1. Download **[Latest Version](https://github.com/shagu/pfDebug/archive/master.zip)**
 2. Unpack the Zip file
 3. Rename the folder "pfDebug-master" to "pfDebug"
 4. Copy "pfDebug" into Wow-Directory\Interface\AddOns
