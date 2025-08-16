@@ -229,7 +229,7 @@ analyzer.scan:SetScript("OnClick", function()
     if frame.GetScript and not frame.pfDEBUGHooked then
       frame.pfDEBUGHooked = true
 
-      local name = (frame.GetName and type(frame.GetName) == "function" and frame:GetName()) and frame:GetName() or frameref[tostring(frame)] or tostring(frame)
+      local name = (frame.GetName and type(frame.GetName) == "function" and frame:GetName()) and frame:GetName() or (frameref[tostring(frame)] ~= "" and frameref[tostring(frame)]) or "<unnamed>" -- or tostring(frame)
 
       local OnEvent = frame:GetScript("OnEvent")
       if OnEvent then
